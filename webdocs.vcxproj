@@ -149,6 +149,7 @@
     <ClInclude Include="src\extlibs\filesystem.h" />
     <ClInclude Include="src\extlibs\NEWLINE_DEF.h" />
     <ClInclude Include="src\extlibs\stringExtensions.h" />
+    <ClInclude Include="src\templates.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
