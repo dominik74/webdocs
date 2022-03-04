@@ -13,6 +13,7 @@ void build();
 void clearBuildDir();
 std::string generateNavCode();
 std::string buildPage(const std::string& contents);
+void generateIndexFile();
 
 std::string navCode;
 
@@ -71,6 +72,7 @@ void build()
 	}
 
 	fs::writeFile(fs::combinePaths(buildDir, "style.css"), CSS_TEMPLATE);
+	generateIndexFile();
 }
 
 void clearBuildDir()
@@ -117,4 +119,10 @@ std::string buildPage(const std::string& contents)
 	strex::replace(result, "[nav content]", navCode);
 	strex::replace(result, "[main content]", contents);
 	return result;
+}
+
+void generateIndexFile()
+{
+	std::string buildDir = fs::combinePaths(fs::getCwd(), "build");
+	fs::writeFile(fs::combinePaths(buildDir, "index.html"), buildPage(""));
 }
