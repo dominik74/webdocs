@@ -10,11 +10,15 @@ namespace strex = stringExtensions;
 
 void generateProjectFolders();
 void build();
+void loadConfig();
+std::string configGetLineValue(const std::vector<std::string>& lines, int index);
 void clearBuildDir();
 std::string generateNavCode();
 std::string buildPage(const std::string& contents);
 void generateIndexFile();
 
+std::string tabText;
+std::string navTitle;
 std::string navCode;
 
 //args 1: command
@@ -40,10 +44,12 @@ void generateProjectFolders()
 {
 	fs::createDirectory("src");
 	fs::createDirectory("build");
+	fs::writeFile("config.txt", CONFIG_TEMPLATE);
 }
 
 void build()
 {
+	loadConfig();
 	clearBuildDir();
 
 	navCode = generateNavCode();
@@ -73,6 +79,36 @@ void build()
 
 	fs::writeFile(fs::combinePaths(buildDir, "style.css"), CSS_TEMPLATE);
 	generateIndexFile();
+}
+
+void loadConfig()
+{
+	std::string config = fs::readFile("config.txt");
+	std::vector<std::string> lines = strex::split(config, '\n');
+
+	tabText = configGetLineValue(lines, 0);
+	navTitle = configGetLineValue(lines, 1);
+}
+
+std::string configGetLineValue(const std::vector<std::string>& lines, int index)
+{
+	std::string::size_type startPos = 0;
+	std::string::size_type endPos = 0;
+
+	startPos = lines[index].find("\"");
+
+	if (startPos != std::string::npos)
+	{
+		startPos++;
+		endPos = lines[index].find("\"", startPos);
+
+		if (endPos != std::string::npos)
+		{
+			return lines[index].substr(startPos, endPos - startPos);
+		}
+	}
+
+	return "";
 }
 
 void clearBuildDir()
@@ -115,7 +151,8 @@ std::string generateNavCode()
 std::string buildPage(const std::string& contents)
 {
 	std::string result = PAGE_TEMPLATE;
-	strex::replace(result, "[website name]", "web docs"); //<- need a config file for this
+	strex::replace(result, "[tab text]", tabText);
+	strex::replace(result, "[nav title]", navTitle);
 	strex::replace(result, "[nav content]", navCode);
 	strex::replace(result, "[main content]", contents);
 	return result;
