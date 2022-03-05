@@ -1,9 +1,11 @@
 #include <iostream>
 #include <filesystem>
+#include <sstream>
 #include "extlibs/filesystem.h"
 #include "extlibs/stringExtensions.h"
 #include "extlibs/NEWLINE_DEF.h"
 #include "templates.h"
+#include "extlibs/maddy/parser.h"
 
 namespace fs = filesystem;
 namespace strex = stringExtensions;
@@ -69,7 +71,11 @@ void build()
 		}
 		else if (file.path().extension() == ".md")
 		{
-			continue; //markdown files currently not supported
+			std::stringstream markdownInput(fs::readFile(file.path().string()));
+			std::shared_ptr<maddy::Parser> parser = std::make_shared<maddy::Parser>();
+			std::string htmlOutput = parser->Parse(markdownInput);
+
+			fs::writeFile(fs::combinePaths(buildDir, file.path().stem().string() + ".html"), buildPage(htmlOutput));
 		}
 		else
 		{

@@ -147,6 +147,28 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\extlibs\filesystem.h" />
+    <ClInclude Include="src\extlibs\maddy\blockparser.h" />
+    <ClInclude Include="src\extlibs\maddy\breaklineparser.h" />
+    <ClInclude Include="src\extlibs\maddy\checklistparser.h" />
+    <ClInclude Include="src\extlibs\maddy\codeblockparser.h" />
+    <ClInclude Include="src\extlibs\maddy\emphasizedparser.h" />
+    <ClInclude Include="src\extlibs\maddy\headlineparser.h" />
+    <ClInclude Include="src\extlibs\maddy\horizontallineparser.h" />
+    <ClInclude Include="src\extlibs\maddy\htmlparser.h" />
+    <ClInclude Include="src\extlibs\maddy\imageparser.h" />
+    <ClInclude Include="src\extlibs\maddy\inlinecodeparser.h" />
+    <ClInclude Include="src\extlibs\maddy\italicparser.h" />
+    <ClInclude Include="src\extlibs\maddy\lineparser.h" />
+    <ClInclude Include="src\extlibs\maddy\linkparser.h" />
+    <ClInclude Include="src\extlibs\maddy\orderedlistparser.h" />
+    <ClInclude Include="src\extlibs\maddy\paragraphparser.h" />
+    <ClInclude Include="src\extlibs\maddy\parser.h" />
+    <ClInclude Include="src\extlibs\maddy\parserconfig.h" />
+    <ClInclude Include="src\extlibs\maddy\quoteparser.h" />
+    <ClInclude Include="src\extlibs\maddy\strikethroughparser.h" />
+    <ClInclude Include="src\extlibs\maddy\strongparser.h" />
+    <ClInclude Include="src\extlibs\maddy\tableparser.h" />
+    <ClInclude Include="src\extlibs\maddy\unorderedlistparser.h" />
     <ClInclude Include="src\extlibs\NEWLINE_DEF.h" />
     <ClInclude Include="src\extlibs\stringExtensions.h" />
     <ClInclude Include="src\templates.h" />
