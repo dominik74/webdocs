@@ -21,6 +21,7 @@ void buildPage(const std::string& fileName, const std::string& contents);
 std::string tabText;
 std::string navTitle;
 std::string navCode;
+std::string style;
 
 //args 1: command
 int main(int argc, char* argv[])
@@ -46,6 +47,7 @@ void generateProjectFiles()
 	fs::createDirectory("src");
 	fs::createDirectory("build");
 	fs::writeFile("config.txt", CONFIG_TEMPLATE);
+	fs::writeFile("config.css", CSS_TEMPLATE);
 }
 
 void build()
@@ -79,7 +81,7 @@ void build()
 		}
 	}
 
-	fs::writeFile(fs::combinePaths("build", "style.css"), CSS_TEMPLATE);
+	fs::writeFile(fs::combinePaths("build", "style.css"), style);
 	buildPage("index.html", "");
 }
 
@@ -90,6 +92,8 @@ void loadConfig()
 
 	tabText = configGetLineValue(lines, 0);
 	navTitle = configGetLineValue(lines, 1);
+
+	style = fs::readFile("config.css");
 }
 
 std::string configGetLineValue(const std::vector<std::string>& lines, int index)
