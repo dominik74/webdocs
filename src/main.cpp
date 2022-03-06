@@ -20,6 +20,8 @@ void buildPage(const std::string& fileName, const std::string& contents);
 
 std::string tabText;
 std::string navTitle;
+bool autoInsertHeadingForTxtFiles;
+
 std::string navCode;
 std::string style;
 
@@ -62,6 +64,10 @@ void build()
 		{
 			std::string contents = fs::readFile(file.path().string());
 			strex::replace(contents, "\n", "<br>");
+
+			if (autoInsertHeadingForTxtFiles)
+				contents = "<h1>" + file.path().stem().string() + "</h1>" + contents;
+
 			buildPage(file.path().stem().string() + ".html", contents);
 		}
 		else if (file.path().extension() == ".md")
@@ -92,6 +98,7 @@ void loadConfig()
 
 	tabText = configGetLineValue(lines, 0);
 	navTitle = configGetLineValue(lines, 1);
+	autoInsertHeadingForTxtFiles = configGetLineValue(lines, 2) == "true";
 
 	style = fs::readFile("config.css");
 }
