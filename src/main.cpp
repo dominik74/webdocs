@@ -75,6 +75,11 @@ void build()
 			std::stringstream markdownInput(fs::readFile(file.path().string()));
 			std::shared_ptr<maddy::Parser> parser = std::make_shared<maddy::Parser>();
 			std::string htmlOutput = parser->Parse(markdownInput);
+
+			strex::replace(htmlOutput, ".md", ".html");
+			strex::replace(htmlOutput, ".png", ".png.html");
+			strex::replace(htmlOutput, ".jpg", ".jpg.html");
+
 			buildPage(file.path().stem().string() + ".html", htmlOutput);
 		}
 		else if (file.path().extension() == ".png" || file.path().extension() == ".jpg")
