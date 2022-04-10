@@ -24,6 +24,7 @@ bool autoInsertHeadingForTxtFiles;
 
 std::string navCode;
 std::string style;
+std::string pageTemplate;
 
 //args 1: command
 int main(int argc, char* argv[])
@@ -37,6 +38,12 @@ int main(int argc, char* argv[])
 	if (std::string(argv[1]) == "build")
 	{
 		build();
+		return 0;
+	}
+
+	if (std::string(argv[1]) == "--use-custom-html")
+	{
+		fs::writeFile("config.html", PAGE_TEMPLATE);
 		return 0;
 	}
 
@@ -106,6 +113,11 @@ void loadConfig()
 	autoInsertHeadingForTxtFiles = configGetLineValue(lines, 2) == "true";
 
 	style = fs::readFile("config.css");
+
+	if (fs::exists("config.html"))
+		pageTemplate = fs::readFile("config.html");
+	else
+		pageTemplate = PAGE_TEMPLATE;
 }
 
 std::string configGetLineValue(const std::vector<std::string>& lines, int index)
@@ -170,7 +182,7 @@ void buildPage(const std::string& fileName, const std::string& contents)
 	strex::replace(navCode, "<tr><td><a href=\"" + fileName + "\">" + displayName + "</a></td></tr>",
 		"<tr id=\"selected\"><td><a href=\"" + fileName + "\">" + displayName + "</a></td></tr>");
 
-	std::string resultContent = PAGE_TEMPLATE;
+	std::string resultContent = pageTemplate;
 	strex::replace(resultContent, "[tab text]", tabText);
 	strex::replace(resultContent, "[nav title]", navTitle);
 	strex::replace(resultContent, "[nav content]", navCode);
