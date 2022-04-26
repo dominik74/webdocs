@@ -34,7 +34,7 @@ body{
 }
 
 aside{
-    width: 20%;
+    width: 300px;
 }
 
 main{
