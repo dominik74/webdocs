@@ -34,11 +34,15 @@ body{
 }
 
 aside{
+    position: fixed;
     width: 300px;
+    height: 100vh;
+    overflow-y: auto;
 }
 
 main{
     flex: 1;
+    margin-left: 310px;
 }
 
 img{
