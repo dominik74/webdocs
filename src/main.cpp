@@ -12,15 +12,21 @@ namespace strex = stringExtensions;
 
 void generateProjectFiles();
 void build();
+void buildSinglePage();
 void loadConfig();
 std::string configGetLineValue(const std::vector<std::string>& lines, int index);
 void clearBuildDir();
 void generateNavCode();
+void generateNavCodeWithSectionLinks();
+std::string parseTextToHtml(const std::filesystem::path& filePath);
+std::string parseMarkdownToHtml(const std::filesystem::path& filePath);
+std::string parseImageToHtml(const std::filesystem::path& filePath);
 void buildPage(const std::string& fileName, const std::string& contents);
 
 std::string tabText;
 std::string navTitle;
 bool autoInsertHeadingForTxtFiles;
+bool singlePageMode;
 
 std::string navCode;
 std::string style;
@@ -37,7 +43,12 @@ int main(int argc, char* argv[])
 
 	if (std::string(argv[1]) == "build")
 	{
-		build();
+		loadConfig();
+
+		if (singlePageMode)
+			buildSinglePage();
+		else
+			build();
 		return 0;
 	}
 
@@ -61,7 +72,6 @@ void generateProjectFiles()
 
 void build()
 {
-	loadConfig();
 	clearBuildDir();
 	generateNavCode();
 
@@ -69,29 +79,17 @@ void build()
 	{
 		if (file.path().extension() == ".txt")
 		{
-			std::string contents = fs::readFile(file.path().string());
-			strex::replace(contents, "\n", "<br>");
-
-			if (autoInsertHeadingForTxtFiles)
-				contents = "<h1>" + file.path().stem().string() + "</h1>" + contents;
-
-			buildPage(file.path().stem().string() + ".html", contents);
+			std::string htmlOutput = parseTextToHtml(file.path());
+			buildPage(file.path().stem().string() + ".html", htmlOutput);
 		}
 		else if (file.path().extension() == ".md")
 		{
-			std::stringstream markdownInput(fs::readFile(file.path().string()));
-			std::shared_ptr<maddy::Parser> parser = std::make_shared<maddy::Parser>();
-			std::string htmlOutput = parser->Parse(markdownInput);
-
-			strex::replace(htmlOutput, ".md", ".html");
-			strex::replace(htmlOutput, ".png", ".png.html");
-			strex::replace(htmlOutput, ".jpg", ".jpg.html");
-
+			std::string htmlOutput = parseMarkdownToHtml(file.path());
 			buildPage(file.path().stem().string() + ".html", htmlOutput);
 		}
 		else if (file.path().extension() == ".png" || file.path().extension() == ".jpg")
 		{
-			std::string htmlImage = "<img src=\"" + file.path().filename().string() + "\">";
+			std::string htmlImage = parseImageToHtml(file.path());
 			buildPage(file.path().filename().string() + ".html", htmlImage);
 
 			fs::copy(fs::combinePaths("src", file.path().filename().string()),
@@ -103,6 +101,38 @@ void build()
 	buildPage("index.html", "");
 }
 
+void buildSinglePage()
+{
+	clearBuildDir();
+	generateNavCodeWithSectionLinks();
+
+	std::string pageContent;
+
+	for (const auto& file : std::filesystem::directory_iterator("src"))
+	{
+		if (file.path().extension() == ".txt")
+		{
+			std::string htmlOutput = parseTextToHtml(file.path());
+			pageContent += "<h1 id=\"" + file.path().stem().string() + "\">" + file.path().stem().string() + "</h1>" + htmlOutput;
+		}
+		else if (file.path().extension() == ".md")
+		{
+			std::string htmlOutput = parseMarkdownToHtml(file.path());
+			pageContent += "<h1 id=\"" + file.path().stem().string() + "\">" + file.path().stem().string() + "</h1>" + htmlOutput;
+		}
+		else if (file.path().extension() == ".png" || file.path().extension() == ".jpg")
+		{
+			pageContent += parseImageToHtml(file.path());
+
+			fs::copy(fs::combinePaths("src", file.path().filename().string()),
+				fs::combinePaths("build", file.path().filename().string()));
+		}
+	}
+
+	fs::writeFile(fs::combinePaths("build", "style.css"), style);
+	buildPage("index.html", pageContent);
+}
+
 void loadConfig()
 {
 	std::string config = fs::readFile("config.txt");
@@ -111,6 +141,7 @@ void loadConfig()
 	tabText = configGetLineValue(lines, 0);
 	navTitle = configGetLineValue(lines, 1);
 	autoInsertHeadingForTxtFiles = configGetLineValue(lines, 2) == "true";
+	singlePageMode = configGetLineValue(lines, 3) == "true";
 
 	style = fs::readFile("config.css");
 
@@ -170,6 +201,56 @@ void generateNavCode()
 	}
 
 	navCode += "</table>";
+}
+
+void generateNavCodeWithSectionLinks()
+{
+	navCode = "<table>\n";
+
+	for (const auto& file : std::filesystem::directory_iterator("src"))
+	{
+		std::string row;
+
+		std::string displayName = file.path().filename().string();
+		strex::replace(displayName, ".txt", "");
+		strex::replace(displayName, ".md", "");
+
+		row = "<tr><td><a href=\"#" + displayName + "\">" + displayName
+			+ "</a></td></tr>\n";
+
+		navCode += row;
+	}
+
+	navCode += "</table>";
+}
+
+std::string parseTextToHtml(const std::filesystem::path& filePath)
+{
+	std::string contents = fs::readFile(filePath.string());
+	strex::replace(contents, "\n", "<br>");
+
+	if (autoInsertHeadingForTxtFiles)
+		contents = "<h1>" + filePath.stem().string() + "</h1>" + contents;
+
+	return contents;
+}
+
+std::string parseMarkdownToHtml(const std::filesystem::path& filePath)
+{
+	std::stringstream markdownInput(fs::readFile(filePath.string()));
+	std::shared_ptr<maddy::Parser> parser = std::make_shared<maddy::Parser>();
+	std::string htmlOutput = parser->Parse(markdownInput);
+
+	strex::replace(htmlOutput, ".md", ".html");
+	strex::replace(htmlOutput, ".png", ".png.html");
+	strex::replace(htmlOutput, ".jpg", ".jpg.html");
+
+	return htmlOutput;
+}
+
+std::string parseImageToHtml(const std::filesystem::path& filePath)
+{
+	return "<img src=\"" + filePath.filename().string() + "\">";
 }
 
 void buildPage(const std::string& fileName, const std::string& contents)

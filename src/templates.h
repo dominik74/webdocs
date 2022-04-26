@@ -51,4 +51,5 @@ img{
 const std::string CONFIG_TEMPLATE =
 R"(tab text: "web docs"
 sidebar title: "web docs"
-auto-insert heading for text files: "false")";
+auto-insert heading for text files: "false"
+single page mode: "false")";
