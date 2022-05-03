@@ -242,8 +242,6 @@ std::string parseMarkdownToHtml(const std::filesystem::path& filePath)
 	std::string htmlOutput = parser->Parse(markdownInput);
 
 	strex::replace(htmlOutput, ".md", ".html");
-	strex::replace(htmlOutput, ".png", ".png.html");
-	strex::replace(htmlOutput, ".jpg", ".jpg.html");
 
 	return htmlOutput;
 }
