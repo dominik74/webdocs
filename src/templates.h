@@ -56,4 +56,6 @@ const std::string CONFIG_TEMPLATE =
 R"(tab text: "web docs"
 sidebar title: "web docs"
 auto-insert heading for text files: "false"
-single page mode: "false")";
+single page mode: "false"
+source directory: "src"
+build directory: "build")";

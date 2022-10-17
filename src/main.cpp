@@ -32,6 +32,9 @@ std::string navCode;
 std::string style;
 std::string pageTemplate;
 
+std::string sourceDirectory;
+std::string buildDirectory;
+
 //args 1: command
 int main(int argc, char* argv[])
 {
@@ -75,7 +78,7 @@ void build()
 	clearBuildDir();
 	generateNavCode();
 
-	for (const auto& file : std::filesystem::directory_iterator("src"))
+	for (const auto& file : std::filesystem::directory_iterator(sourceDirectory))
 	{
 		if (file.path().extension() == ".txt")
 		{
@@ -92,12 +95,12 @@ void build()
 			std::string htmlImage = parseImageToHtml(file.path());
 			buildPage(file.path().filename().string() + ".html", htmlImage);
 
-			fs::copy(fs::combinePaths("src", file.path().filename().string()),
-				fs::combinePaths("build", file.path().filename().string()));
+			fs::copy(fs::combinePaths(sourceDirectory, file.path().filename().string()),
+				fs::combinePaths(buildDirectory, file.path().filename().string()));
 		}
 	}
 
-	fs::writeFile(fs::combinePaths("build", "style.css"), style);
+	fs::writeFile(fs::combinePaths(buildDirectory, "style.css"), style);
 	buildPage("index.html", "");
 }
 
@@ -108,7 +111,7 @@ void buildSinglePage()
 
 	std::string pageContent;
 
-	for (const auto& file : std::filesystem::directory_iterator("src"))
+	for (const auto& file : std::filesystem::directory_iterator(sourceDirectory))
 	{
 		if (file.path().extension() == ".txt")
 		{
@@ -124,12 +127,12 @@ void buildSinglePage()
 		{
 			pageContent += parseImageToHtml(file.path());
 
-			fs::copy(fs::combinePaths("src", file.path().filename().string()),
-				fs::combinePaths("build", file.path().filename().string()));
+			fs::copy(fs::combinePaths(sourceDirectory, file.path().filename().string()),
+				fs::combinePaths(buildDirectory, file.path().filename().string()));
 		}
 	}
 
-	fs::writeFile(fs::combinePaths("build", "style.css"), style);
+	fs::writeFile(fs::combinePaths(buildDirectory, "style.css"), style);
 	buildPage("index.html", pageContent);
 }
 
@@ -142,6 +145,8 @@ void loadConfig()
 	navTitle = configGetLineValue(lines, 1);
 	autoInsertHeadingForTxtFiles = configGetLineValue(lines, 2) == "true";
 	singlePageMode = configGetLineValue(lines, 3) == "true";
+	sourceDirectory = configGetLineValue(lines, 4);
+	buildDirectory = configGetLineValue(lines, 5);
 
 	style = fs::readFile("config.css");
 
@@ -174,7 +179,7 @@ std::string configGetLineValue(const std::vector<std::string>& lines, int index)
 
 void clearBuildDir()
 {
-	for (const auto& path : std::filesystem::directory_iterator("build"))
+	for (const auto& path : std::filesystem::directory_iterator(buildDirectory))
 	{
 		std::filesystem::remove_all(path);
 	}
@@ -184,7 +189,7 @@ void generateNavCode()
 {
 	navCode = "<table>\n";
 
-	for (const auto& file : std::filesystem::directory_iterator("src"))
+	for (const auto& file : std::filesystem::directory_iterator(sourceDirectory))
 	{
 		std::string row;
 
@@ -207,7 +212,7 @@ void generateNavCodeWithSectionLinks()
 {
 	navCode = "<table>\n";
 
-	for (const auto& file : std::filesystem::directory_iterator("src"))
+	for (const auto& file : std::filesystem::directory_iterator(sourceDirectory))
 	{
 		std::string row;
 
@@ -267,5 +272,5 @@ void buildPage(const std::string& fileName, const std::string& contents)
 	strex::replace(resultContent, "[nav content]", navCode);
 	strex::replace(resultContent, "[main content]", contents);
 
-	fs::writeFile(fs::combinePaths("build", fileName), resultContent);
+	fs::writeFile(fs::combinePaths(buildDirectory, fileName), resultContent);
 }
