@@ -80,6 +80,9 @@ void build()
 
 	for (const auto& file : std::filesystem::directory_iterator(sourceDirectory))
 	{
+		if (file.path().filename().string()[0] == '.')
+			continue;
+
 		if (file.path().extension() == ".txt")
 		{
 			std::string htmlOutput = parseTextToHtml(file.path());
@@ -113,6 +116,9 @@ void buildSinglePage()
 
 	for (const auto& file : std::filesystem::directory_iterator(sourceDirectory))
 	{
+		if (file.path().filename().string()[0] == '.')
+			continue;
+
 		if (file.path().extension() == ".txt")
 		{
 			std::string htmlOutput = parseTextToHtml(file.path());
@@ -191,6 +197,9 @@ void generateNavCode()
 
 	for (const auto& file : std::filesystem::directory_iterator(sourceDirectory))
 	{
+		if (file.path().filename().string()[0] == '.')
+			continue;
+
 		std::string row;
 
 		std::string displayName = file.path().filename().string();
@@ -214,6 +223,9 @@ void generateNavCodeWithSectionLinks()
 
 	for (const auto& file : std::filesystem::directory_iterator(sourceDirectory))
 	{
+		if (file.path().filename().string()[0] == '.')
+			continue;
+
 		std::string row;
 
 		std::string displayName = file.path().filename().string();
